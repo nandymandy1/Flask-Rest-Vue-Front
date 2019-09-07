@@ -208,9 +208,16 @@ def add_product(current_user):
         new_product = Product(name, description, price, qty)
         db.session.add(new_product)
         db.session.commit()
-        return product_schema.jsonify(new_product)
+        return jsonify({
+            'success': True,
+            'message': "Product added successfully",
+            'product': new_product
+        })
     else:
-        return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
+        return jsonify({
+            'success': False,
+            'message': "Product with this name already exists. Try with other name."
+        })
 
 
 # Get All Products
@@ -228,7 +235,14 @@ def get_products():
 @app.route('/api/product/<id>', methods=['GET'])
 def get_product(id):
     product = Product.query.get(id)
-    return product_schema.jsonify(product)
+    if product:
+        return jsonify({'product': product})
+    else:
+        return jsonify({
+            'success': False,
+            'message': "Product not found",
+        })
+
 
 # Update a Product
 
@@ -237,20 +251,22 @@ def get_product(id):
 @requires_admin
 def update_product(current_user, id):
     product = Product.query.get(id)
-
-    name = request.json['name']
-    description = request.json['description']
-    price = request.json['price']
-    qty = request.json['qty']
-
-    product.name = name
-    product.description = description
-    product.price = price
-    product.qty = qty
-
-    db.session.commit()
-
-    return product_schema.jsonify(product)
+    if product:
+        product.name = request.json['name']
+        product.description = request.json['description']
+        product.price = request.json['price']
+        product.qty = request.json['qty']
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': "Product updated successfully",
+            'product': product
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': "Product does not exist."
+        })
 
 
 # Delete Product
@@ -260,10 +276,19 @@ def update_product(current_user, id):
 @requires_admin
 def delete_product(current_user, id):
     product = Product.query.get(id)
-    db.session.delete(product)
-    db.session.commit()
-
-    return product_schema.jsonify(product)
+    if product:
+        db.session.delete(product)
+        db.session.commit()
+        return product_schema.jsonify({
+            'success': True,
+            'message': "Product deleted successfully.",
+            'product': product
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': "Product does not exist."
+        })
 
 
 # Run Server
