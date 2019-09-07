@@ -185,19 +185,32 @@ def get_user_by_email_or_username(value):
     else:
         return None
 
+# Product Functions
+
+
+def check_if_product_exists(name):
+    product = Product.query.filter_by(name=name).first()
+    if product:
+        return False
+    else:
+        return True
+
 
 @app.route('/api/product', methods=['POST'])
 @requires_admin
 def add_product(current_user):
-    name = request.json['name']
-    description = request.json['description']
-    price = request.json['price']
-    qty = request.json['qty']
+    if check_if_product_exists(request.json['name']):
+        name = request.json['name']
+        description = request.json['description']
+        price = request.json['price']
+        qty = request.json['qty']
 
-    new_product = Product(name, description, price, qty)
-    db.session.add(new_product)
-    db.session.commit()
-    return product_schema.jsonify(new_product)
+        new_product = Product(name, description, price, qty)
+        db.session.add(new_product)
+        db.session.commit()
+        return product_schema.jsonify(new_product)
+    else:
+        return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
 
 
 # Get All Products
