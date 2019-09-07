@@ -1,12 +1,12 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc
-from flask_marshmallow import Marshmallow
-from werkzeug.security import check_password_hash, generate_password_hash
-from functools import wraps
 import os
 import jwt
 import datetime
+from sqlalchemy import exc
+from functools import wraps
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify
+from flask_marshmallow import Marshmallow
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Init app
 app = Flask(__name__)
@@ -93,20 +93,34 @@ def requires_admin(f):
             token = request.headers['Authorization']
 
         if not token:
-            return jsonify({'message': 'Unauthorized'}), 401
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized'
+            }), 401
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.filter_by(
                 id=data['user']['id']).first()
-            print()
         except:
-            return jsonify({'message': 'Invalid Token'}), 401
+            return jsonify({
+                'success': False,
+                'message': 'Invalid Token'
+            }), 401
 
-        if current_user.isAdmin:
-            return f(current_user, *args, **kwargs)
+        if current_user:
+            if current_user.isAdmin:
+                return f(current_user, *args, **kwargs)
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Unauthorized'
+                }), 401
         else:
-            return jsonify({'message': 'UnAuthorized'}), 401
+            return jsonify({
+                'success': False,
+                'message': 'User not found.'
+            }), 401
 
     return decorated
 
