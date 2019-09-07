@@ -84,7 +84,7 @@ products_schema = ProductSchema(many=True)
 # Token Middleware
 
 
-def token_required(f):
+def requires_admin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -99,10 +99,13 @@ def token_required(f):
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.filter_by(
                 id=data['user']['id']).first()
+
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-
-        return f(current_user, *args, **kwargs)
+        if current_user['isAdmin']:
+            return f(current_user, *args, **kwargs)
+        else:
+            return jsonify({'message': 'Unauthorized'}), 401
 
     return decorated
 
@@ -183,7 +186,7 @@ def get_user_by_email_or_username(value):
 
 
 @app.route('/api/product', methods=['POST'])
-@token_required
+@requires_admin
 def add_product(current_user):
     name = request.json['name']
     description = request.json['description']
@@ -217,7 +220,7 @@ def get_product(id):
 
 
 @app.route('/api/product/<id>', methods=['PUT'])
-@token_required
+@requires_admin
 def update_product(current_user, id):
     product = Product.query.get(id)
 
@@ -240,7 +243,7 @@ def update_product(current_user, id):
 
 
 @app.route('/api/product/<id>', methods=['DELETE'])
-@token_required
+@requires_admin
 def delete_product(current_user, id):
     product = Product.query.get(id)
     db.session.delete(product)
