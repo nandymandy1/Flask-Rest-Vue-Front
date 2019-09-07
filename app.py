@@ -99,13 +99,14 @@ def requires_admin(f):
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.filter_by(
                 id=data['user']['id']).first()
-
+            print()
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-        if current_user['isAdmin']:
+
+        if current_user.isAdmin:
             return f(current_user, *args, **kwargs)
         else:
-            return jsonify({'message': 'Unauthorized'}), 401
+            return jsonify({'message': 'UnAuthorized'}), 401
 
     return decorated
 
