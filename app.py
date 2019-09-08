@@ -223,9 +223,9 @@ def add_product(current_user):
         db.session.add(new_product)
         db.session.commit()
 
-        return products_schema.jsonify({'success': True, 'message': "Product added successfully", 'product': new_product})
+        return jsonify({'success': True, 'message': "Product added successfully", 'product': new_product})
     else:
-        return products_schema.jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
+        return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
 
 
 # Get All Products
@@ -235,7 +235,7 @@ def add_product(current_user):
 def get_products():
     all_products = Product.query.all()
     result = products_schema.dump(all_products)
-    return products_schema.jsonify(result)
+    return jsonify(result)
 
 # Get Single Products
 
@@ -244,9 +244,9 @@ def get_products():
 def get_product(id):
     product = Product.query.get(id)
     if product:
-        return products_schema.jsonify({'product': product})
+        return jsonify(product)
     else:
-        return products_schema.jsonify({
+        return jsonify({
             'success': False,
             'message': "Product not found",
         })
@@ -265,7 +265,7 @@ def update_product(current_user, id):
         product.price = request.json['price']
         product.qty = request.json['qty']
         db.session.commit()
-        return products_schema.jsonify({
+        return jsonify({
             'success': True,
             'message': "Product updated successfully",
             'product': product
@@ -287,13 +287,13 @@ def delete_product(current_user, id):
     if product:
         db.session.delete(product)
         db.session.commit()
-        return product_schema.jsonify({
+        return jsonify({
             'success': True,
             'message': "Product deleted successfully.",
             'product': product
         })
     else:
-        return products_schema.jsonify({
+        return jsonify({
             'success': False,
             'message': "Product does not exist."
         })
