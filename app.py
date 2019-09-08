@@ -295,7 +295,7 @@ def delete_product(current_user, id):
     if product:
         db.session.delete(product)
         db.session.commit()
-        result = products_schema.dump(product)
+        # result = products_schema.dump(product)
         return jsonify({
             'success': True,
             'message': "Product deleted successfully.",
