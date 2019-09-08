@@ -146,11 +146,11 @@ def register_user():
             new_user = User(name, username, email, password, isAdmin)
             db.session.add(new_user)
             db.session.commit()
-            return jsonify({"success": True, "message": "You are Registred Successfully"})
+            return jsonify({"success": True, "message": "You are Registred Successfully"}), 202
         else:
-            return jsonify({"success": False, "message": "Email is already registered. Did you forget your password."})
+            return jsonify({"success": False, "message": "Email is already registered. Did you forget your password."}), 422
     else:
-        return jsonify({"success": False, "message": "Username taken please try with another one."})
+        return jsonify({"success": False, "message": "Username taken please try with another one."}), 422
 
 # Login User
 
@@ -162,7 +162,7 @@ def login_user():
     print(username, password)
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'success': False, "message": "Username not found."})
+        return jsonify({'success': False, "message": "Username not found."}), 404
     else:
         if check_password_hash(user.password, password):
             token = jwt.encode({
@@ -174,9 +174,9 @@ def login_user():
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=60),
                 'iat': datetime.datetime.utcnow()
             }, app.config['SECRET_KEY'])
-            return jsonify({'success': True, "token": token.decode('UTF-8'), 'message': "Hurray login is successful"})
+            return jsonify({'success': True, "token": token.decode('UTF-8'), 'message': "Hurray login is successful"}), 202
         else:
-            return jsonify({'success': False, 'message': "Incorrect password."})
+            return jsonify({'success': False, 'message': "Incorrect password."}), 401
 
 # User Functions
 
@@ -223,9 +223,9 @@ def add_product(current_user):
         db.session.add(new_product)
         db.session.commit()
         result = product_schema.dump(product)
-        return jsonify({'success': True, 'message': "Product added successfully", 'product': result})
+        return jsonify({'success': True, 'message': "Product added successfully", 'product': result}), 201
     else:
-        return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
+        return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."}), 422
 
 
 # Get All Products
@@ -235,7 +235,7 @@ def add_product(current_user):
 def get_products():
     all_products = Product.query.all()
     result = products_schema.dump(all_products)
-    return jsonify(result)
+    return jsonify(result), 200
 
 # Get Single Products
 
@@ -245,12 +245,12 @@ def get_product(id):
     product = Product.query.get(id)
     if product:
         result = product_schema.dump(product)
-        return jsonify(result)
+        return jsonify(result), 200
     else:
         return jsonify({
             'success': False,
             'message': "Product not found",
-        })
+        }), 404
 
 
 # Update a Product
@@ -271,12 +271,12 @@ def update_product(current_user, id):
             'success': True,
             'message': "Product updated successfully",
             'product': result
-        })
+        }), 304
     else:
         return products_schema.jsonify({
             'success': False,
             'message': "Product does not exist."
-        })
+        }), 404
 
 
 # Delete Product
@@ -294,12 +294,12 @@ def delete_product(current_user, id):
             'success': True,
             'message': "Product deleted successfully.",
             'product': result
-        })
+        }), 200
     else:
         return jsonify({
             'success': False,
             'message': "Product does not exist."
-        })
+        }), 404
 
 
 # Run Server
