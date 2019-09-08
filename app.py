@@ -222,14 +222,8 @@ def add_product(current_user):
         new_product = Product(name, description, price, qty)
         db.session.add(new_product)
         db.session.commit()
-        product = {
-            "description": new_product.description,
-            "id": new_product.id,
-            "name": new_product.name,
-            "price": new_product.price,
-            "qty": new_product.qty
-        }
-        return jsonify({'success': True, 'message': "Product added successfully", 'product': product})
+        result = product_schema.dump(product)
+        return jsonify({'success': True, 'message': "Product added successfully", 'product': result})
     else:
         return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
 
@@ -272,7 +266,7 @@ def update_product(current_user, id):
         product.price = request.json['price']
         product.qty = request.json['qty']
         db.session.commit()
-        result = products_schema.dump(product)
+        result = product_schema.dump(product)
         return jsonify({
             'success': True,
             'message': "Product updated successfully",
@@ -293,9 +287,9 @@ def update_product(current_user, id):
 def delete_product(current_user, id):
     product = Product.query.get(id)
     if product:
+        result = product_schema.dump(product)
         db.session.delete(product)
         db.session.commit()
-        # result = products_schema.dump(product)
         return jsonify({
             'success': True,
             'message': "Product deleted successfully.",
