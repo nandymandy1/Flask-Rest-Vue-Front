@@ -222,7 +222,7 @@ def add_product(current_user):
         new_product = Product(name, description, price, qty)
         db.session.add(new_product)
         db.session.commit()
-
+        print(new_product)
         return jsonify({'success': True, 'message': "Product added successfully", 'product': new_product})
     else:
         return jsonify({'success': False, 'message': "Product with this name already exists. Try with other name."})
