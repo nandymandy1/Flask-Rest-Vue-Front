@@ -272,10 +272,11 @@ def update_product(current_user, id):
         product.price = request.json['price']
         product.qty = request.json['qty']
         db.session.commit()
+        result = products_schema.dump(product)
         return jsonify({
             'success': True,
             'message': "Product updated successfully",
-            'product': product
+            'product': result
         })
     else:
         return products_schema.jsonify({
@@ -294,10 +295,11 @@ def delete_product(current_user, id):
     if product:
         db.session.delete(product)
         db.session.commit()
+        result = products_schema.dump(product)
         return jsonify({
             'success': True,
             'message': "Product deleted successfully.",
-            'product': product
+            'product': result
         })
     else:
         return jsonify({
