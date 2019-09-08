@@ -250,7 +250,8 @@ def get_products():
 def get_product(id):
     product = Product.query.get(id)
     if product:
-        return jsonify(product)
+        result = product_schema.dump(product)
+        return jsonify(result)
     else:
         return jsonify({
             'success': False,
