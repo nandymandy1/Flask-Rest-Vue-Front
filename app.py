@@ -84,7 +84,7 @@ products_schema = ProductSchema(many=True)
 # Token Middleware
 
 
-def requires_admin(f):
+def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -125,15 +125,11 @@ def requires_admin(f):
     return decorated
 
 # Index Route
-
-
 @app.route('/', methods=['GET'])
 def index():
     return '<h1>Vue Heroku Application</h1>'
 
 # Register User
-
-
 @app.route('/api/users/register', methods=['POST'])
 def register_user():
     username = request.json['username']
@@ -153,13 +149,11 @@ def register_user():
         return jsonify({"success": False, "message": "Username taken please try with another one."}), 422
 
 # Login User
-
-
 @app.route('/api/users/login', methods=['POST'])
 def login_user():
     username = request.json['username']
     password = request.json['password']
-    print(username, password)
+
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({'success': False, "message": "Username not found."}), 404
@@ -211,14 +205,13 @@ def check_if_product_exists(name):
 
 
 @app.route('/api/product', methods=['POST'])
-@requires_admin
+@requires_auth
 def add_product(current_user):
     name = request.json['name']
     if check_if_product_exists(name):
         description = request.json['description']
         price = request.json['price']
         qty = request.json['qty']
-
         new_product = Product(name, description, price, qty)
         db.session.add(new_product)
         db.session.commit()
@@ -256,8 +249,8 @@ def get_product(id):
 # Update a Product
 
 
-@app.route('/api/product/<id>', methods=['PUT'])
-@requires_admin
+@app.route('/api/product/<int:id>', methods=['PUT'])
+@requires_auth
 def update_product(current_user, id):
     product = Product.query.get(id)
     if product:
@@ -266,14 +259,16 @@ def update_product(current_user, id):
         product.price = request.json['price']
         product.qty = request.json['qty']
         db.session.commit()
-        result = product_schema.dump(product)
+        updated_product = product_schema.dump(product)
+        print(updated_product)
         return jsonify({
-            'success': True,
-            'message': "Product updated successfully",
-            'product': result
-        }), 304
+            "success": True,
+            "message": "Product updated successfully",
+            "product": updated_product
+        }), 200
+
     else:
-        return products_schema.jsonify({
+        return jsonify({
             'success': False,
             'message': "Product does not exist."
         }), 404
@@ -283,7 +278,7 @@ def update_product(current_user, id):
 
 
 @app.route('/api/product/<id>', methods=['DELETE'])
-@requires_admin
+@requires_auth
 def delete_product(current_user, id):
     product = Product.query.get(id)
     if product:
