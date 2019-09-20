@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <div class="row center">
+    <div class="row center mt-5">
       <div class="col-md-5 mx-auto">
         <div class="card mx-auto">
           <h5 class="card-header primary-color white-text text-center py-4">
