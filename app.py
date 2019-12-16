@@ -7,10 +7,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_cors import CORS, cross_origin
 
 # Init app
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'db.sqlite')
@@ -22,9 +26,6 @@ db = SQLAlchemy(app)
 
 # Init ma
 ma = Marshmallow(app)
-
-# PORT
-# port = int(os.environ.get('PORT', 5000))
 
 # Product Class/Model
 
@@ -131,6 +132,7 @@ def index():
 
 # Register User
 @app.route('/api/users/register', methods=['POST'])
+@cross_origin()
 def register_user():
     username = request.json['username']
     if check_unique_username_email(username, 'username'):
@@ -150,6 +152,7 @@ def register_user():
 
 # Login User
 @app.route('/api/users/login', methods=['POST'])
+@cross_origin()
 def login_user():
     username = request.json['username']
     password = request.json['password']

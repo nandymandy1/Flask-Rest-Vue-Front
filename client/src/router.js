@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
+import store from "./store";
 
 Vue.use(Router);
 
@@ -7,6 +8,7 @@ Vue.use(Router);
 import Auth from "@/views/Auth.vue";
 import Accounts from "@/views/Accounts.vue";
 import Home from "./views/Home.vue";
+
 /**
  * Components
  */
@@ -23,7 +25,7 @@ let AuthRoutes = {
   name: "Auth",
   redirect: "/auth/login",
   meta: {
-    requiresAuth: false
+    requiresGuest: true
   },
   children: [
     {
@@ -43,7 +45,7 @@ let AccountRoutes = {
   path: "/accounts",
   component: Accounts,
   name: "Accounts",
-  redirect: "/accounts",
+  redirect: "/accounts/products",
   meta: {
     requiresAuth: true
   },
@@ -61,7 +63,7 @@ let AccountRoutes = {
   ]
 };
 
-export default new Router({
+const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
@@ -79,3 +81,23 @@ export default new Router({
     AccountRoutes
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!store.getters["Auth/isLoggedIn"]) {
+      next("/login");
+    } else {
+      next();
+    }
+  } else if (to.matched.some(record => record.meta.requiresGuest)) {
+    if (store.getters["Auth/isLoggedIn"]) {
+      next("/accounts/products");
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
+export default router;

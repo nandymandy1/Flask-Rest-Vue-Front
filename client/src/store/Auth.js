@@ -24,6 +24,7 @@ const getters = {
       }
     }
   },
+
   authState: state => state.status,
   user: state => state.user,
   error: state => state.error,
@@ -35,7 +36,6 @@ const actions = {
   // Login Action
   async login({ commit }, user) {
     commit("auth_request");
-    delete user.plainPassword;
     let res = await postData("/users/login", user);
     if (res.success) {
       let { token } = res;
@@ -73,7 +73,7 @@ const actions = {
     if (type == "none") {
       router.push("/");
     } else {
-      router.push("/login");
+      router.push("/auth/login");
     }
     return;
   }
@@ -89,7 +89,7 @@ const mutations = {
     state.token = token;
     state.status = "success";
     state.error = null;
-    router.push("/dashboard");
+    router.push("/accounts/profile");
     state.loginTime = parseInt(Date.now() / 1000);
   },
 
@@ -119,7 +119,7 @@ const mutations = {
   },
 
   profile_loaded(state, profile) {
-    state.user = profile;
+    state.user = profile.user;
     state.exp = profile.exp;
   },
 

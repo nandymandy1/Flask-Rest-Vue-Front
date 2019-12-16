@@ -2,7 +2,7 @@
   <div class="container mt-5">
     <div class="row center">
       <div class="col-md-5 mx-auto">
-        <div class="card mx-auto">
+        <div class="card mx-auto my-5">
           <h5 class="card-header primary-color white-text text-center py-4">
             <strong>Register</strong>
           </h5>
@@ -21,30 +21,17 @@
                 <label for="email">E-mail</label>
               </div>
               <div class="md-form">
-                <input
-                  type="password"
-                  id="password"
-                  class="form-control validate"
-                  v-model="user.password"
-                />
-                <label
-                  for="password"
-                  :data-error="passwordError ? passwordError : null"
-                  :data-success="!passwordError ? 'Password matched' : null"
-                >Password</label>
+                <input type="password" id="password" class="form-control" v-model="user.password" />
+                <label for="password">Password</label>
               </div>
               <div class="md-form">
                 <input
                   type="password"
                   id="confirmpassword"
-                  class="form-control validate"
+                  class="form-control"
                   v-model="user.confirmPassword"
                 />
-                <label
-                  for="confirmpassword"
-                  :data-error="passwordError ? passwordError : null"
-                  :data-success="!passwordError ? 'Password matched' : null"
-                >Confirm Password</label>
+                <label for="confirmpassword">Confirm Password</label>
               </div>
               <button class="btn btn-primary btn-block my-4" type="submit">Register</button>
               <p>
@@ -74,15 +61,8 @@ export default {
       }
     };
   },
-  computed: {
-    passwordError() {
-      return this.user.password !== this.user.confirmPassword &&
-        this.user.password &&
-        this.user.confirmPassword
-        ? "Passwords don't match"
-        : null;
-    }
-  },
-  methods: {}
+  methods: {
+    async registerUser() {}
+  }
 };
 </script>

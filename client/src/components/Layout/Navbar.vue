@@ -15,7 +15,6 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="basicExampleNav">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
@@ -27,13 +26,16 @@
         </ul>
 
         <ul class="navbar-nav ml-auto mr-4">
-          <li class="nav-item">
+          <li class="nav-item" v-if="!loggedIn">
             <router-link class="nav-link" to="/auth/login">Login</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!loggedIn">
             <router-link class="nav-link" to="/auth/register">Register</router-link>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item" v-if="loggedIn">
+            <router-link class="nav-link" to="/accounts/products">Products</router-link>
+          </li>
+          <li class="nav-item dropdown" v-if="loggedIn">
             <a
               class="nav-link dropdown-toggle"
               id="navbarDropdownMenuLink"
@@ -42,8 +44,8 @@
               aria-expanded="false"
             >Accounts</a>
             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="#">Profile</a>
-              <a class="dropdown-item" href="#">Logout</a>
+              <router-link to="/accounts/profile" class="dropdown-item">Profile</router-link>
+              <a class="dropdown-item" href="#" @click.prevent="logoutUser()">Logout</a>
             </div>
           </li>
         </ul>
@@ -51,6 +53,22 @@
     </nav>
   </div>
 </template>
+
+<script>
+import { mapGetters, mapActions } from "vuex";
+export default {
+  computed: {
+    ...mapGetters({
+      loggedIn: "Auth/isLoggedIn"
+    })
+  },
+  methods: {
+    ...mapActions({
+      logoutUser: "Auth/logout"
+    })
+  }
+};
+</script>
 
 <style scoped>
 .my-primary-gradient {
